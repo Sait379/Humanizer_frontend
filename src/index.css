@@ -14,3 +14,22 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+/* Subtle gray scrollbar exactly like your screenshot */
+.custom-scroll {
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: rgba(0,0,0,.25) transparent;
+}
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;                          /* Chrome/Edge */
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.25);
+  border-radius: 9999px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,.35);
+}
