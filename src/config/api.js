@@ -5,19 +5,18 @@ const BASE_URL =
 export async function apiClient(path, options = {}) {
   const url = `${BASE_URL}${path}`;
 
-  const defaultHeaders = {
-    "Content-Type": "application/json",
-  };
-
   const config = {
-    method: "GET",
-    headers: { ...defaultHeaders, ...options.headers },
-    ...options,
+    method: options.method || "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+    body: options.body,
+    mode: "cors",
   };
 
   const response = await fetch(url, config);
 
-  // Handle HTTP errors gracefully
   if (!response.ok) {
     let message = `Request failed (${response.status})`;
     try {
@@ -29,3 +28,4 @@ export async function apiClient(path, options = {}) {
 
   return response.json();
 }
+
