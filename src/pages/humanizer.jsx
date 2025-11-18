@@ -16,6 +16,18 @@ export default function HumanizeUploadPage() {
   const [copied, setCopied] = useState(false);
   const inputRef = useRef(null);
 
+  const MAX_WORDS = 500;
+
+  const loadingMessages = [
+  "Humanizing your text…",
+  "This may take a few seconds…",
+  "Almost done…",
+  "Polishing your content…",
+  "Making it more natural…",
+];
+
+  const [loadingIndex, setLoadingIndex] = useState(0);
+
   const inputWordCount = useMemo(() => countWords(input), [input]);
   const outputWordCount = useMemo(() => countWords(output), [output]);
 
@@ -75,6 +87,10 @@ export default function HumanizeUploadPage() {
   /* -------------------- HUMANIZE HANDLER -------------------- */
  async function handleHumanize() {
   if (!input.trim()) return;
+  if (inputWordCount > MAX_WORDS) {
+  showToast(`Maximum limit is ${MAX_WORDS} words.`, "error");
+  return;
+}
 
   // Minimum 50 characters check
   if (input.trim().length < 50) {
@@ -138,6 +154,29 @@ export default function HumanizeUploadPage() {
     setOutput("");
     setShowDeleteModal(false);
   }
+
+  const Loader = () => (
+  <div className="flex flex-col items-center justify-center h-full animate-fadeIn">
+    <div className="loader-spin mb-3"></div>
+
+    <p className="text-gray-500 text-sm transition-opacity duration-500">
+      {loadingMessages[loadingIndex]}
+    </p>
+  </div>
+);
+
+
+  React.useEffect(() => {
+  if (isProcessing) {
+    const interval = setInterval(() => {
+      setLoadingIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 3000); // change every 1.5 sec
+
+    return () => clearInterval(interval);
+  }
+}, [isProcessing]);
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff4e8] to-[#fffaf6] text-gray-800 font-sans">
@@ -209,15 +248,23 @@ export default function HumanizeUploadPage() {
 
             <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 pt-2 bg-white">
               <div className="flex justify-between items-center text-sm text-gray-500 border-t border-gray-100 pt-2">
-                <span>{inputWordCount} words</span>
-                <button
-                  onClick={handleHumanize}
-                  disabled={!input.trim() || isProcessing}
-                  className="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 transition"
-                >
-                  {isProcessing ? "Processing..." : "Humanize"}
-                </button>
-              </div>
+
+  {/* WORD COUNTER */}
+  <span className={inputWordCount > MAX_WORDS ? "text-red-500 font-semibold" : ""}>
+    {inputWordCount} / {MAX_WORDS} words
+  </span>
+
+  {/* HUMANIZE BUTTON */}
+  <button
+    onClick={handleHumanize}
+    disabled={!input.trim() || isProcessing || inputWordCount > MAX_WORDS}
+    className="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 transition"
+  >
+    {isProcessing ? "Processing..." : "Humanize"}
+  </button>
+
+</div>
+
             </div>
           </div>
 
@@ -242,14 +289,22 @@ export default function HumanizeUploadPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-hidden pr-0">
-              <textarea
-                readOnly
-                value={output}
-                placeholder="Your humanized text will appear here."
-                className="w-full h-full resize-none outline-none bg-transparent text-gray-700 p-2 overflow-y-auto"
-              />
-            </div>
+            <div className="flex-1 overflow-hidden pr-0 relative">
+
+  {/* Show loader when processing */}
+  {isProcessing ? (
+    <Loader />
+  ) : (
+    <textarea
+      readOnly
+      value={output}
+      placeholder="Your humanized text will appear here."
+      className="w-full h-full resize-none outline-none bg-transparent text-gray-700 p-2 overflow-y-auto"
+    />
+  )}
+
+</div>
+
 
             <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 bg-white pt-2">
               <div className="text-sm text-gray-500 border-t border-gray-100 pt-2">

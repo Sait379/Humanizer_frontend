@@ -33,3 +33,25 @@ html, body {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(0,0,0,.35);
 }
+
+/* Custom circle spinner */
+.loader-spin {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #ffd4b3;
+  border-top-color: #ff6a3d;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+/* Fade animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
